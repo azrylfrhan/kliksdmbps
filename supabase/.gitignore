@@ -1,0 +1,14 @@
+# Supabase local state
+.branches
+.branches/
+.temp
+.temp/
+
+# Env and local secrets
+.env
+.env.keys
+.env.local
+.env.*.local
+
+# Logs
+*.log

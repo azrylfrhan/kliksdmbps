@@ -1,0 +1,28 @@
+# OS files
+.DS_Store
+desktop.ini
+
+# Editor
+.vscode/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+
+# Common build artifacts
+node_modules/
+dist/
+build/
+
+# Supabase local artifacts
+supabase/.temp/
+supabase/.branches/
+supabase/.env
+supabase/.env.*
+
+# Local CLI binary (do not commit)
+supabase.exe
