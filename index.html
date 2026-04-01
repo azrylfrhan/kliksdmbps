@@ -756,13 +756,19 @@ async function loadKPRecap() {
 function getGolStats(data) {
     const s = { 'Gol IV': 0, 'Gol III': 0, 'Gol II': 0, 'Fungsional': 0 };
     data.forEach(r => {
-        const x = (r.new_rank || '').toLowerCase();
-        // Golongan IV
-        if (x.includes('iv/') || x.includes('iv-') || x.includes('pembina')) s['Gol IV']++;
-        // Golongan III
-        else if (x.includes('iii/') || x.includes('iii-') || x.includes('penata')) s['Gol III']++;
-        // Golongan II
-        else if (x.includes('ii/') || x.includes('ii-') || x.includes('pengatur')) s['Gol II']++;
+    const x = (r.new_rank || r.old_rank || '').toLowerCase().trim();
+    const compact = x.replace(/[\s./-]/g, '');
+    // Menangani format umum seperti IVa, IIId, III/b, III-b, serta variasi teks golongan.
+    const isGolIV = compact.startsWith('iv') || /\bgol(?:ongan)?\s*iv\b/.test(x) || x.includes('pembina');
+    const isGolIII = compact.startsWith('iii') || /\bgol(?:ongan)?\s*iii\b/.test(x) || x.includes('penata');
+    const isGolII = compact.startsWith('ii') || /\bgol(?:ongan)?\s*ii\b/.test(x) || x.includes('pengatur');
+
+    // Golongan IV
+    if (isGolIV) s['Gol IV']++;
+    // Golongan III
+    else if (isGolIII) s['Gol III']++;
+    // Golongan II
+    else if (isGolII) s['Gol II']++;
         // Jabatan Fungsional (Statistisi, Pranata, dll)
         else if (x.includes('utama') || x.includes('madya') || x.includes('muda') || x.includes('pertama')) s['Fungsional']++;
         else s['Fungsional']++;
@@ -776,9 +782,10 @@ function drawKPChart(data) {
     const s = getGolStats(data);
     const lbls = Object.keys(s).filter(k => s[k] > 0);
     if (!lbls.length) return;
+    const chartLabels = lbls.map(l => l === 'Fungsional' ? 'Golongan Fungsional' : l);
     kpChart = new Chart(c.getContext('2d'), {
         type: 'bar',
-        data: { labels: lbls.map(l => 'Golongan ' + l), datasets: [{ label: 'Jumlah', data: lbls.map(k => s[k]), backgroundColor: ['rgba(245,158,11,.85)', 'rgba(59,130,246,.85)', 'rgba(139,92,246,.85)'], borderWidth: 2, borderRadius: 8 }] },
+      data: { labels: chartLabels, datasets: [{ label: 'Jumlah', data: lbls.map(k => s[k]), backgroundColor: ['rgba(245,158,11,.85)', 'rgba(59,130,246,.85)', 'rgba(139,92,246,.85)', 'rgba(16,185,129,.85)'], borderWidth: 2, borderRadius: 8 }] },
         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } }, x: { grid: { display: false } } } }
     });
 }
